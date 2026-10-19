@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>니이가타 3박 4일 프리미엄 여행 가이드</title>
+
+  <!-- Web App (PWA) Standalone Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="니이가타 여행">
+  <meta name="application-name" content="니이가타 여행 가이드">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22%EB%8B%88%EC%9D%B4%EA%B0%80%ED%83%80%203%EB%B0%95%204%EC%9D%BC%20%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84%20%ED%88%AC%EC%96%B4%22%2C%22short_name%22%3A%22%EB%8B%88%EC%9D%B4%EA%B0%80%ED%83%80%EC%95%B1%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Leaflet CSS & JS for Interactive Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Google Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+            },
+            sado: '#059669',
+            uonuma: '#d97706',
+            tokyo: '#7c3aed'
+          }
+        }
+      }
+    }
+  </script>
+
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    /* Map styling */
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 380px;
+      z-index: 10;
+    }
+    .leaflet-popup-content-wrapper {
+      border-radius: 1rem;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+    }
+    .leaflet-popup-content {
+      margin: 0;
+      line-height: 1.5;
+    }
+    
+    /* Pulsing user location icon */
+    .user-pulse-marker {
+      width: 16px;
+      height: 16px;
+      background-color: #3b82f6;
+      border: 3px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+      position: relative;
+    }
+    .user-pulse-marker::after {
+      content: '';
+      position: absolute;
+      top: -7px;
+      left: -7px;
+      width: 24px;
+      height: 24px;
+      background-color: rgba(59, 130, 246, 0.4);
+      border-radius: 50%;
+      animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.6); opacity: 0.9; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+  </style>
+
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased pb-24 md:pb-12 min-h-screen">
+
+  <header class="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 shadow-inner">
+          <i class="fa-solid fa-plane-departure text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-500/30 text-sky-300 border border-sky-400/20">3박 4일 단체투어</span>
+            <span class="text-xs text-slate-400">9명 전용 점보택시</span>
+          </div>
+          <h1 class="text-lg md:text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+            니이가타 & 사도섬 힐링 트립
+          </h1>
+        </div>
+      </div>
+
+  <div class="flex items-center gap-2">
+    <button onclick="openDeployModal()" class="px-3 py-1.5 text-xs font-semibold bg-emerald-600/90 hover:bg-emerald-500 text-white rounded-lg transition flex items-center gap-1.5 shadow-sm">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      <span>앱 배포·설치</span>
+    </button>
+    <button onclick="openInfoModal()" class="px-3 py-1.5 text-xs font-medium bg-slate-800/80 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-200 transition flex items-center gap-1.5 shadow-sm">
+      <i class="fa-solid fa-file-invoice text-amber-400"></i>
+      <span class="hidden sm:inline">예약 정보</span>
+    </button>
+    <button onclick="locateUser()" class="px-3 py-1.5 text-xs font-medium bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition flex items-center gap-1.5 shadow-sm">
+      <i class="fa-solid fa-location-crosshairs text-white animate-pulse"></i>
+      <span>내 위치</span>
+    </button>
+  </div>
+</div>
+
+<!-- Quick Date Navigation Tabs -->
+<div class="bg-slate-900/90 border-t border-slate-800 px-3 py-1 overflow-x-auto">
+  <div class="max-w-6xl mx-auto flex space-x-2 text-xs font-medium whitespace-nowrap py-1" id="dayTabsContainer">
+    <!-- Generated by JS -->
+  </div>
+</div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-5 space-y-6">
+
+<!-- Secondary Tab Bar (View Selector) -->
+<div class="flex items-center justify-between border-b border-slate-200 pb-2">
+  <div class="flex space-x-1 sm:space-x-2 overflow-x-auto text-xs sm:text-sm font-semibold">
+    <button onclick="switchView('timeline')" id="viewBtn-timeline" class="view-btn px-3 py-1.5 rounded-lg bg-sky-600 text-white flex items-center gap-1.5 transition">
+      <i class="fa-regular fa-clock"></i> 상세 일정표
+    </button>
+    <button onclick="switchView('specialties')" id="viewBtn-specialties" class="view-btn px-3 py-1.5 rounded-lg bg-white text-slate-600 hover:bg-slate-100 flex items-center gap-1.5 transition border border-slate-200">
+      <i class="fa-solid fa-utensils text-amber-500"></i> 특산물 & 쇼핑
+    </button>
+    <button onclick="switchView('weather')" id="viewBtn-weather" class="view-btn px-3 py-1.5 rounded-lg bg-white text-slate-600 hover:bg-slate-100 flex items-center gap-1.5 transition border border-slate-200">
+      <i class="fa-solid fa-cloud-sun text-sky-500"></i> 시간대별 날씨
+    </button>
+    <button onclick="switchView('ai')" id="viewBtn-ai" class="view-btn px-3 py-1.5 rounded-lg bg-white text-slate-600 hover:bg-slate-100 flex items-center gap-1.5 transition border border-slate-200">
+      <i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i> AI 여행 도우미
+    </button>
+  </div>
+  <div class="text-xs text-slate-500 hidden md:block">
+    <i class="fa-regular fa-calendar-check text-sky-600 mr-1"></i> 2026.10.22(목) ~ 10.25(일)
+  </div>
+</div>
+
+<section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden transition-all">
+  <div class="p-3.5 bg-slate-50/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center space-x-2">
+      <div class="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center text-xs">
+        <i class="fa-solid fa-map-location-dot"></i>
+      </div>
+      <div>
+        <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+          여행 이동 경로 지도
+          <span id="mapDayBadge" class="text-[11px] px-2 py-0.5 rounded-md font-medium bg-sky-100 text-sky-700">전체 일정</span>
+        </h2>
+      </div>
+    </div>
+    <div class="flex items-center space-x-1.5">
+      <button onclick="fitCurrentDayRoute()" class="text-xs px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-md font-medium text-slate-700 transition">
+        <i class="fa-solid fa-expand text-slate-500 mr-1"></i>경로 한눈에
+      </button>
+      <button onclick="locateUser()" class="text-xs px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-md font-medium text-slate-700 transition">
+        <i class="fa-solid fa-crosshairs text-sky-600 mr-1"></i>현재 위치
+      </button>
+    </div>
+  </div>
+  
+  <!-- Leaflet Map Container -->
+  <div class="relative w-full h-[320px] sm:h-[400px]">
+    <div id="map"></div>
+    
+    <!-- Legend Overlay -->
+    <div class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-xl text-[11px] border border-slate-200 shadow-md z-[400] flex flex-wrap gap-2 items-center">
+      <span class="font-bold text-slate-700">구간:</span>
+      <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span> 1일차 니이가타</span>
+      <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> 2일차 사도섬</span>
+      <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 3일차 우오누마/유자와</span>
+      <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span> 4일차 도쿄귀국</span>
+    </div>
+  </div>
+</section>
+
+<div id="daySummaryCard" class="bg-gradient-to-br from-white to-sky-50/40 p-4 rounded-2xl border border-sky-100 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  <!-- Dynamic summary filled by JS -->
+</div>
+
+<!-- 1. Timeline View (Default) -->
+<div id="timelineView" class="space-y-4">
+  <div class="flex items-center justify-between px-1">
+    <h3 id="timelineTitle" class="text-base font-bold text-slate-800 flex items-center gap-2">
+      <!-- Populated by JS -->
+    </h3>
+    <span id="spotCountText" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
+      <!-- Populated by JS -->
+    </span>
+  </div>
+  <div id="spotsContainer" class="space-y-4">
+    <!-- Spot cards rendered by JS -->
+  </div>
+</div>
+
+<!-- 2. Specialties & Shopping View -->
+<div id="specialtiesView" class="hidden space-y-4">
+  <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-base">
+        <i class="fa-solid fa-utensils"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-slate-900 text-sm">니이가타 & 사도섬 대표 특산물 및 먹킷리스트</h3>
+        <p class="text-xs text-slate-500">여행 중 꼭 맛보고 사야 할 명물과 추천 매장 안내입니다.</p>
+      </div>
+    </div>
+    <div class="text-xs text-amber-700 bg-amber-50 px-3 py-1 rounded-lg border border-amber-200 font-medium">
+      <i class="fa-solid fa-circle-info mr-1"></i>맛본 음식은 완료 체크할 수 있습니다
+    </div>
+  </div>
+  <div id="specialtiesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- 3. Weather Detailed View -->
+<div id="weatherView" class="hidden space-y-4">
+  <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center text-base">
+        <i class="fa-solid fa-cloud-sun"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-slate-900 text-sm">3박 4일 시간대별 상세 날씨 & 복장 안내</h3>
+        <p class="text-xs text-slate-500">오전, 오후, 저녁별 기온과 체감 날씨 정보입니다.</p>
+      </div>
+    </div>
+    <div class="text-xs text-sky-700 bg-sky-50 px-3 py-1 rounded-lg border border-sky-200 font-medium">
+      <i class="fa-solid fa-temperature-half mr-1"></i>10월 하순 평균 10~19°C (일교차 주의)
+    </div>
+  </div>
+  <div id="weatherDetailedCards" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- 4. AI Travel Assistant View -->
+<div id="aiView" class="hidden space-y-4">
+  <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+    <div class="flex items-center justify-between border-b pb-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg shadow-inner">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div>
+          <h3 class="font-bold text-slate-900 text-sm sm:text-base">니이가타 전용 AI 여행 도우미</h3>
+          <p class="text-[11px] sm:text-xs text-slate-500">일정, 미식 메뉴, 사케 추천, 일본어 회화 등 무엇이든 질문하세요.</p>
+        </div>
+      </div>
+      <span class="text-[11px] px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 font-semibold">Gemini AI</span>
+    </div>
+
+    <!-- Quick Question Chips -->
+    <div class="flex flex-wrap gap-1.5 text-xs">
+      <button onclick="setAiPrompt('1일차 지콘(而今)과 2일차 아나구치(あなぐち) 추천 메뉴와 매력을 알려줘')" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg border border-purple-200 transition text-[11px]">
+        🍽️ 지콘 & 아나구치 추천 메뉴
+      </button>
+      <button onclick="setAiPrompt('헤기소바 맛있게 먹는 법과 코지마야 특징 알려줘')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition text-[11px]">
+        🍜 헤기소바 먹는 꿀팁
+      </button>
+      <button onclick="setAiPrompt('폰슈칸 사케 자판기 이용 방법과 추천 사케 종류는?')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition text-[11px]">
+        🍶 폰슈칸 사케 자판기 팁
+      </button>
+      <button onclick="setAiPrompt('소설 설국의 무대 료칸 다카한의 역사와 온천 특징을 알려줘')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition text-[11px]">
+        📖 료칸 다카한 & 설국 이야기
+      </button>
+    </div>
+
+    <!-- Chat History -->
+    <div id="aiChatHistory" class="p-3.5 space-y-3 h-[320px] overflow-y-auto bg-slate-50/70 rounded-xl border border-slate-200/80 text-xs sm:text-sm">
+      <div class="bg-slate-100 text-slate-700 p-3 rounded-xl rounded-tl-none w-fit max-w-[85%] text-xs leading-relaxed border border-slate-200/50">
+        안녕하세요! 갓치 와카코 고객님 일행의 3박 4일 니이가타 & 사도섬 여행을 안내하는 전용 AI 가이드입니다. 
+        헤기소바, 지콘, 아나구치 예약 코스 요리, 폰슈칸 이용법, 이동 팁 등 궁금한 점을 편하게 물어보세요! 😊
+      </div>
+    </div>
+
+    <!-- Input Box -->
+    <div class="flex items-center gap-2">
+      <input type="text" id="aiInput" placeholder="니이가타 여행에 대해 물어보세요 (예: 지콘 추천 사케는?)" 
+             class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+             onkeydown="if(event.key === 'Enter') sendAiMessage()" />
+      <button onclick="sendAiMessage()" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow-sm">
+        <span>질문</span>
+        <i class="fa-solid fa-paper-plane text-xs"></i>
+      </button>
+    </div>
+  </div>
+</div>
+  </main>
+
+  <!-- Deploy & Mobile App Installation Guide Modal -->
+  <div id="deployModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-rocket"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">웹앱 무료 배포 및 스마트폰 설치 가이드</h3>
+            <p class="text-[11px] text-slate-500">누구나 1분 만에 웹사이트로 만들고 홈 화면에 설치할 수 있습니다.</p>
+          </div>
+        </div>
+        <button onclick="closeDeployModal()" class="text-slate-400 hover:text-slate-600 p-1 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+  <div class="space-y-3.5 text-xs text-slate-600">
+    <!-- Step 1: Netlify Drop 10-second deployment -->
+    <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
+      <div class="flex items-center justify-between font-bold text-emerald-900 text-sm">
+        <span class="flex items-center gap-1.5">
+          <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">1</span>
+          가장 쉬운 무료 배포 (Netlify Drop - 10초 완료)
+        </span>
+        <span class="text-[10px] bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full">가장 추천</span>
+      </div>
+      <ol class="list-decimal list-inside space-y-1 pl-1 text-slate-700 leading-relaxed">
+        <li>현재 완성된 코드를 컴퓨터에 <strong>index.html</strong> 파일로 저장합니다.</li>
+        <li>새 폴더를 하나 만들고 그 안에 <strong>index.html</strong>을 넣습니다.</li>
+        <li>인터넷 브라우저로 <strong>app.netlify.com/drop</strong> 사이트에 접속합니다.</li>
+        <li>해당 폴더를 마우스로 화면 점선 칸에 <strong>끌어다 놓기(Drag & Drop)</strong>만 하면 즉시 고유 웹 주소(예: <code class="bg-emerald-100 px-1 py-0.5 rounded text-emerald-900 font-mono">https://niigata-trip.netlify.app</code>)가 생성됩니다!</li>
+      </ol>
+    </div>
+
+    <!-- Step 2: GitHub Pages (Optional for developers) -->
+    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
+      <div class="flex items-center gap-1.5 font-bold text-slate-800">
+        <span class="w-5 h-5 rounded-full bg-slate-700 text-white flex items-center justify-center text-[10px]">2</span>
+        GitHub Pages 배포 (영구 무료 운영)
+      </div>
+      <p class="text-[11px] text-slate-600 leading-relaxed pl-1">
+        GitHub에 새 Repository를 생성한 뒤 <code class="bg-slate-200 px-1 py-0.5 rounded font-mono">index.html</code>을 업로드하고, <strong>Settings ➔ Pages ➔ Branch: main</strong>을 선택하면 무료로 전 세계 어디서든 접속 가능한 웹사이트가 됩니다.
+      </p>
+    </div>
+
+    <!-- Step 3: Add to Phone Home Screen (PWA) -->
+    <div class="p-3 bg-sky-50/70 border border-sky-200 rounded-xl space-y-2">
+      <div class="flex items-center gap-1.5 font-bold text-sky-950 text-sm">
+        <span class="w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[10px]">3</span>
+        스마트폰에 '진짜 앱'처럼 설치하는 법 (9인 일행 필수)
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+        <div class="bg-white p-2.5 rounded-lg border border-sky-100 space-y-1">
+          <div class="font-bold text-slate-800 flex items-center gap-1">
+            <i class="fa-brands fa-apple text-slate-700"></i> 아이폰 (Safari 브라우저)
+          </div>
+          <p class="text-slate-600 leading-normal">
+            1. 사파리로 링크 접속<br>
+            2. 하단 <strong>공유 아이콘 (네모+화살표)</strong> 터치<br>
+            3. 메뉴에서 <strong>'홈 화면에 추가'</strong> 선택<br>
+            ➔ 주소창 없이 <strong>전체 화면 앱</strong>으로 실행됩니다!
+          </p>
+        </div>
+        <div class="bg-white p-2.5 rounded-lg border border-sky-100 space-y-1">
+          <div class="font-bold text-slate-800 flex items-center gap-1">
+            <i class="fa-brands fa-android text-emerald-600"></i> 안드로이드 (크롬 브라우저)
+          </div>
+          <p class="text-slate-600 leading-normal">
+            1. 크롬으로 링크 접속<br>
+            2. 우측 상단 <strong>점 3개 메뉴(⋮)</strong> 터치<br>
+            3. <strong>'홈 화면에 추가'</strong> 또는 <strong>'앱 설치'</strong> 선택<br>
+            ➔ 바탕화면에 앱 아이콘이 바로 생성됩니다!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Share with Tour Members -->
+    <div class="p-3 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-amber-950 flex items-center gap-1">
+          <i class="fa-solid fa-share-nodes text-amber-600"></i> 일행에게 카카오톡으로 공유하기
+        </span>
+        <button onclick="copyCurrentWebUrl()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-md text-[11px] font-bold transition flex items-center gap-1">
+          <i class="fa-regular fa-copy"></i> 주소 복사
+        </button>
+      </div>
+      <p class="text-[11px] text-amber-800 leading-tight">
+        배포 후 나온 링크를 복사하여 9명의 일행 카카오톡 단체방에 공유해 주세요. 각자 스마트폰 홈 화면에 추가해두면 3박 4일 내내 비행기, 택시, 식당에서 편리하게 열람할 수 있습니다.
+      </p>
+    </div>
+  </div>
+
+  <button onclick="closeDeployModal()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition">
+    가이드 닫기
+  </button>
+</div>
+  </div>
+
+  <div id="infoModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-receipt text-sky-600 text-lg"></i>
+          <h3 class="font-bold text-slate-900 text-base">[견적서 요약] 20261022 4일</h3>
+        </div>
+        <button onclick="closeInfoModal()" class="text-slate-400 hover:text-slate-600 p-1 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+  <div class="text-xs space-y-3 text-slate-600">
+    <div class="bg-slate-50 p-3 rounded-xl border space-y-1">
+      <div class="flex justify-between font-semibold text-slate-800">
+        <span>수신: 갓치 와카코 고객님</span>
+        <span>인원: 9명</span>
+      </div>
+      <div class="text-slate-500">담당: 최선희 010-4684-1451 (주)테라투어</div>
+    </div>
+
+    <div class="bg-sky-50 p-3 rounded-xl border border-sky-100 space-y-1">
+      <div class="font-bold text-sky-950 flex justify-between">
+        <span>요금 안내</span>
+        <span class="text-sky-700 font-extrabold">1,230,000원 (+예약금 30만원/선결제)</span>
+      </div>
+      <div class="text-[11px] text-sky-800">와카코: 1,100,000원 (카드수수료 3% 별도)</div>
+    </div>
+
+    <div class="space-y-1.5">
+      <h4 class="font-bold text-slate-800">포함 사항</h4>
+      <ul class="list-disc list-inside space-y-1 pl-1 text-slate-600 text-[11px]">
+        <li>1. 일정상의 숙박 (료칸 2박 + 니이가타 시내 호텔 1박)</li>
+        <li>2. 1, 2일차 전용 차량 (점보택시 하이에이스) 유류비, 도로비, 주차비, 회송료, 기사 비용 (일비, 식대, 팁) / 열차 탑승권</li>
+        <li>3. 모든 식사 포함 (단, 2차/3차 개인 음료 및 주류는 개인 부담)</li>
+      </ul>
+    </div>
+
+    <div class="space-y-1.5">
+      <h4 class="font-bold text-slate-800">주요 긴급 연락처</h4>
+      <div class="grid grid-cols-2 gap-2 text-[11px]">
+        <div class="p-2 bg-slate-100 rounded-lg">
+          <span class="font-semibold block text-slate-800">호텔 글로벌 뷰 니이가타:</span> 
+          <a href="tel:025-244-5151" class="text-sky-600 font-bold">025-244-5151</a>
+        </div>
+        <div class="p-2 bg-slate-100 rounded-lg">
+          <span class="font-semibold block text-slate-800">후루마치 지콘 (而今):</span> 
+          <a href="tel:025-378-1651" class="text-sky-600 font-bold">025-378-1651</a>
+        </div>
+        <div class="p-2 bg-slate-100 rounded-lg">
+          <span class="font-semibold block text-slate-800">사도 오료리 아나구치:</span> 
+          <a href="tel:0259-58-7227" class="text-sky-600 font-bold">0259-58-7227</a>
+        </div>
+        <div class="p-2 bg-slate-100 rounded-lg">
+          <span class="font-semibold block text-slate-800">코지마야 총본점:</span> 025-272-8838
+        </div>
+        <div class="p-2 bg-slate-100 rounded-lg col-span-2">
+          <span class="font-semibold block text-slate-800">료칸 다카한 (雪国の宿 高半):</span> 025-784-3333
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="closeInfoModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold">
+    확인 완료
+  </button>
+</div>
+  </div>
+
+  <script>
+    // Complete structured trip data extracted from the uploaded estimate
+    const TRIP_DATA = {
+      meta: {
+        title: "20261022 니이가타 4일 견적 일정",
+        period: "2026.10.22(목) ~ 2026.10.25(일)",
+        party: "9명",
+        vehicle: "하이에이스 점보택시 (1,2일차)",
+      },
+      days: [
+        {
+          id: 1,
+          date: "10/22(목)",
+          title: "니이가타 시내 도착 & 미식·문화 탐방",
+          region: "니이가타 시내",
+          badgeColor: "bg-sky-500",
+          textColor: "text-sky-600",
+          weather: {
+            morning: { temp: "13°C", condition: "구름 조금", icon: "fa-cloud-sun", desc: "도착 직후 쾌청하며 선선함" },
+            afternoon: { temp: "18°C", condition: "맑음", icon: "fa-sun", desc: "시내 관광하기 온화하고 쾌적" },
+            evening: { temp: "14°C", condition: "선선함", icon: "fa-moon", desc: "체크인 후 저녁 식사 시 쌀쌀" },
+          },
+          summary: "인천공항 출발 후 니이가타에 도착하여 명물 헤기소바와 사사모찌를 즐기고 하쿠산 신사와 후루사토무라를 둘러본 뒤 호텔에 체크인합니다.",
+          spots: [
+            {
+              time: "09:40 - 11:45",
+              name: "인천공항 T2 ➔ 니이가타 공항 도착",
+              jpName: "仁川空港T2 ➔ 新潟空港",
+              type: "flight",
+              icon: "fa-plane",
+              lat: 37.9558,
+              lng: 139.1214,
+              tel: "",
+              transport: "항공편 (대한항공 등)",
+              desc: "인천공항 제2터미널 출발 후 약 2시간 비행으로 혼슈 동해안의 관문 니이가타 공항에 도착합니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80",
+              mustDo: "입국 수속 및 9인 짐 수령 후 대기 중인 점보택시 합류"
+            },
+            {
+              time: "12:30",
+              name: "점보택시(하이에이스) 탑승",
+              jpName: "ジャンボタクシー搭乗",
+              type: "transport",
+              icon: "fa-van-shuttle",
+              lat: 37.9540,
+              lng: 139.1200,
+              tel: "",
+              transport: "전용 점보택시",
+              desc: "9인 전원이 여유롭게 탑승할 수 있는 전용 하이에이스 점보택시로 1,2일차 일정을 편리하게 이동합니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=600&q=80",
+              mustDo: "짐 싣기 및 편안한 시내 드라이브 시작"
+            },
+            {
+              time: "12:45",
+              name: "점심식사 : 코지마야 총본점 마츠자키점",
+              jpName: "小嶋屋総本店 松崎店",
+              type: "restaurant",
+              icon: "fa-utensils",
+              lat: 37.9285,
+              lng: 139.0988,
+              tel: "025-272-8838",
+              transport: "차량 15분",
+              desc: "니이가타의 명물인 '헤기소바'의 원조 명가입니다. 해초(청각채)를 섞어 반죽하여 독특한 푸른빛과 쫄깃하고 미끄러지는 듯한 면발이 일품입니다.",
+              foodTip: "헤기소바(へぎそば) + 바삭한 계절 모둠 튀김(텐푸라)",
+              image: "https://images.unsplash.com/photo-1618841557871-b4664fbf0cb3?auto=format&fit=crop&w=600&q=80",
+              mustDo: "나무 틀(헤기)에 한 입 크기로 가지런히 담겨 나오는 소바를 특제 쯔유와 와사비로 맛보기"
+            },
+            {
+              time: "14:00",
+              name: "디저트 : 다나카야 본점 미나토 공방",
+              jpName: "田中屋本店 みなと工房",
+              type: "dessert",
+              icon: "fa-cookie-bite",
+              lat: 37.9304,
+              lng: 139.0660,
+              tel: "025-225-8822",
+              transport: "차량 15분",
+              desc: "시나노강변에 위치한 니이가타 최고의 떡 전문점. 조릿대 잎으로 감싼 쑥떡인 '사사당고(笹団子)'와 '사사모찌'를 직접 빚는 공방과 카페가 함께 있습니다.",
+              foodTip: "사사모찌, 갓 찐 사사당고, 팥 소프트아이스크림",
+              image: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=600&q=80",
+              mustDo: "향긋한 조릿대 향이 밴 쫄깃한 쑥떡 맛보기 및 기념품 구매"
+            },
+            {
+              time: "15:00",
+              name: "하쿠산 신사 (하쿠산공원)",
+              jpName: "白山神社",
+              type: "sightseeing",
+              icon: "fa-torii-gate",
+              lat: 37.9142,
+              lng: 139.0369,
+              tel: "025-228-2963",
+              transport: "차량 10분",
+              desc: "1,000년이 넘는 역사를 지닌 니이가타의 대표적인 진수 신사로 인연 맺기와 가정 평안의 명소입니다. 주변 네덜란드풍 하쿠산 정원도 산책하기 좋습니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80",
+              mustDo: "풍경(風鈴) 길 걷기 및 여행 안전 기원 부적 오마모리 구경"
+            },
+            {
+              time: "15:45",
+              name: "미치노에키 후루사토무라 바자르관",
+              jpName: "ふるさと村 バザール館",
+              type: "shopping",
+              icon: "fa-basket-shopping",
+              lat: 37.8687,
+              lng: 139.0146,
+              tel: "025-230-3000",
+              transport: "차량 15분",
+              desc: "니이가타현 전역의 특산물, 쌀, 사케, 센베이, 전통 공예품이 총망라된 대형 종합 테마 파크입니다. 시음 코너와 선물 쇼핑에 최적입니다.",
+              foodTip: "니이가타 센베이, 야스다 요거트, 각종 지자케(지역 사케)",
+              image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+              mustDo: "니이가타 쌀로 만든 과자 시식 및 사케 컬렉션 구경"
+            },
+            {
+              time: "16:30",
+              name: "호텔 체크인 : 호텔 글로벌 뷰 니이가타",
+              jpName: "ホテルグローバルビュー新潟",
+              type: "hotel",
+              icon: "fa-hotel",
+              lat: 37.9144,
+              lng: 139.0605,
+              tel: "025-244-5151",
+              transport: "차량 20분",
+              desc: "니이가타역 만다이구치(万代口) 바로 앞에 위치한 최고 입지의 호텔. 여행의 피로를 풀어주는 사우나 및 대욕장 시설을 완비하고 있으며, 니이가타역 내 명물 사케 박물관 '폰슈칸'과도 도보 2분 거리입니다.",
+              foodTip: "체크인 후 니이가타역 폰슈칸 니혼슈 시음 (코인 자판기) 산책",
+              image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80",
+              mustDo: "체크인 후 대욕장에서 휴식 또는 도보 2분 거리 폰슈칸에서 가볍게 워밍업 사케 시음"
+            },
+            {
+              time: "18:00",
+              name: "저녁식사 : 니이가타 후루마치 지콘 (而今)",
+              jpName: "新潟古町 而今 (じこん)",
+              type: "dinner",
+              icon: "fa-wine-glass",
+              lat: 37.9252,
+              lng: 139.0438,
+              tel: "025-378-1651",
+              transport: "차량 10분 / 택시",
+              desc: "역사와 전통이 깃든 니이가타의 옛 화류가 후루마치(古町)에 위치한 프리미엄 일본 요리 전문점. 동해의 신선한 최상급 해산물과 명물 눈볼대(노도구로) 숯불구이, 엄선된 극상 사케를 프라이빗한 공간에서 만끽합니다.",
+              foodTip: "노도구로(눈볼대) 숯불구이, 제철 모둠 사시미, 지콘(而今) 사케 및 니이가타 지자케",
+              image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80",
+              mustDo: "고즈넉한 후루마치 거리 정취와 함께 니이가타 최고급 해산물·사케 페어링"
+            }
+          ]
+        },
+        {
+          id: 2,
+          date: "10/23(금)",
+          title: "신비의 섬 사도(佐渡) 완전 정복",
+          region: "사도섬 (佐渡島)",
+          badgeColor: "bg-emerald-600",
+          textColor: "text-emerald-700",
+          weather: {
+            morning: { temp: "12°C", condition: "상쾌함", icon: "fa-wind", desc: "제트호일 탑승 시 파도 잔잔, 시원한 바닷바람" },
+            afternoon: { temp: "17°C", condition: "맑음", icon: "fa-sun", desc: "다라이분 및 공원 산책하기 최적의 가을 날씨" },
+            evening: { temp: "13°C", condition: "구름 조금", icon: "fa-cloud-moon", desc: "료칸 온천욕과 가이세키를 즐기기 좋은 쌀쌀함" },
+          },
+          summary: "초고속 제트호일을 타고 사도섬에 입도하여 전통 대야배 체험, 해산물 만찬, 천연기념물 따오기 관람, 텐료하이 양조장을 견학한 뒤 사도섬 료칸에 숙박합니다.",
+          spots: [
+            {
+              time: "07:20 - 07:55",
+              name: "호텔 출발 ➔ 니이가타항 제트호일 탑승",
+              jpName: "新潟港 ジェットフォイル搭乗",
+              type: "transport",
+              icon: "fa-ship",
+              lat: 37.9360,
+              lng: 139.0680,
+              tel: "",
+              transport: "전용 점보택시 ➔ 쾌속선",
+              desc: "물 위를 날아가는 보잉 929 제트호일을 타고 사도섬 료츠항까지 67분 만에 쾌속 항해합니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=600&q=80",
+              mustDo: "선창 밖으로 펼쳐지는 동해 바다 절경 감상"
+            },
+            {
+              time: "09:02 - 09:20",
+              name: "사도섬 료츠항 도착 & 점보택시 탑승",
+              jpName: "両津港 下船 ➔ ジャンボタクシー",
+              type: "transport",
+              icon: "fa-van-shuttle",
+              lat: 38.0818,
+              lng: 138.4344,
+              tel: "新潟交通佐渡(株)",
+              transport: "점보택시 환승",
+              desc: "사도의 관문 료츠항에 도착하여 대기 중인 사도 교통 전용 점보택시로 환승합니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80",
+              mustDo: "사도섬 가이드 기사님 미팅"
+            },
+            {
+              time: "10:30",
+              name: "오기 민속박물관 (센고쿠부네 전시관)",
+              jpName: "小木民俗博物館",
+              type: "sightseeing",
+              icon: "fa-landmark",
+              lat: 37.8228,
+              lng: 138.2831,
+              tel: "0259-86-2604",
+              transport: "차량 50분",
+              desc: "사도섬 남단 오기 지역의 해운 역사와 어촌 생활상을 전시한 박물관. 실물 크기로 복원된 19세기 전통 목선 '센고쿠부네(千石船)'에 직접 올라가 볼 수 있습니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80",
+              mustDo: "웅장한 전통 범선 센고쿠부네 갑판에 올라 기념사진 촬영"
+            },
+            {
+              time: "11:30",
+              name: "다라이분 (대야배) 체험",
+              jpName: "たらい舟 体験 (力屋観光汽船)",
+              type: "activity",
+              icon: "fa-water",
+              lat: 37.8182,
+              lng: 138.2778,
+              tel: "0259-86-3153",
+              transport: "차량 5분",
+              desc: "사도섬의 상징! 미소 된장통을 개조해 해초와 소라를 채취하던 둥근 나무배 '다라이분'을 타고 에메랄드빛 바다를 유람합니다. 직접 노 젓기 체험도 가능합니다.",
+              foodTip: "사도 해초 소프트아이스크림",
+              image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+              mustDo: "전통 삿갓을 쓰고 노를 저어보며 노 젓기 면허증(기념증) 받기"
+            },
+            {
+              time: "12:15 - 13:45",
+              name: "점심식사 : 오료리 아나구치 (Anaguchi-tei)",
+              jpName: "お料理 あなぐち (宿根木)",
+              type: "restaurant",
+              icon: "fa-utensils",
+              lat: 37.8145,
+              lng: 138.2435,
+              tel: "0259-58-7227",
+              transport: "다라이분 후 차량 7분 (슈쿠네기)",
+              desc: "국가 중요 전통 건조물군 보존지구인 사도섬 슈쿠네기(宿根木)의 에도시대 키타마에부네(北前船) 선주 저택을 재생한 독보적인 분위기의 로컬 프렌치 레스토랑. 사도섬 자연산 해산물, 명품 사도규(佐渡牛) 스테이크, 키타마에부네 시대의 역사적 식기에 정갈하게 담겨 나오는 특별한 코스 요리를 즐깁니다.",
+              foodTip: "사도규(佐渡牛) 숯불 스테이크, 사도 제철 해산물 프렌치 런치 코스, 자가제 디저트",
+              image: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=600&q=80",
+              mustDo: "우아한 선주 저택의 일본식 정원을 조망하며 식사 후 슈쿠네기 전통 목조 가옥 골목길 산책"
+            },
+            {
+              time: "14:30",
+              name: "토키노모리 공원 (따오기 숲)",
+              jpName: "トキの森公園",
+              type: "sightseeing",
+              icon: "fa-feather-pointed",
+              lat: 38.0305,
+              lng: 138.3971,
+              tel: "0259-22-4123",
+              transport: "차량 20분",
+              desc: "일본에서 멸종 위기에 처했던 국제보호조이자 천연기념물 '따오기(朱鷺, 토키)'를 인공 증식하여 자연으로 돌려보내는 공원입니다. 우아한 따오기를 바로 눈앞에서 관찰할 수 있습니다.",
+              foodTip: "따오기 모양 사도 감 만쥬",
+              image: "https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=600&q=80",
+              mustDo: "근거리 관찰관(토키 랩 뷰)에서 아름다운 분홍빛 깃털의 따오기 감상"
+            },
+            {
+              time: "15:30",
+              name: "텐료하이 양조장 견학",
+              jpName: "天領盃酒造 見学",
+              type: "experience",
+              icon: "fa-bottle-droplet",
+              lat: 38.0772,
+              lng: 138.4230,
+              tel: "0259-26-3135",
+              transport: "차량 15분",
+              desc: "사도섬의 맑은 눈 녹은 물과 사도산 쌀로 빚는 명품 사케 '마야(雅楽代)'로 일본 전국에서 주목받는 젊은 감각의 혁신 양조장입니다. 주조 시설 견학과 무료 시음이 진행됩니다.",
+              foodTip: "마야(雅楽代) 사케, 텐료하이 다이긴죠 시음 및 구매",
+              image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80",
+              mustDo: "신선한 원주(原酒) 시음과 양조장 한정판 사케 득템"
+            },
+            {
+              time: "17:30",
+              name: "사도 료칸 도착 & 온천·가이세키",
+              jpName: "旅館到着 (夕食・温泉)",
+              type: "hotel",
+              icon: "fa-hot-tub-person",
+              lat: 38.0750,
+              lng: 138.4300,
+              tel: "",
+              transport: "차량 10분",
+              desc: "전통 료칸에 체크인하여 바다를 바라보는 노천탕에서 여행의 피로를 풀고, 사도섬의 진미가 가득 차려진 호화 가이세키 요리를 즐깁니다.",
+              foodTip: "사도 해산물 가이세키 코스 & 지역 토속주",
+              image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80",
+              mustDo: "온천욕 후 유카타를 입고 즐기는 여유로운 밤"
+            }
+          ]
+        },
+        {
+          id: 3,
+          date: "10/24(토)",
+          title: "설국의 정취, 우오누마 사토 & 온천 료칸",
+          region: "우오누마 / 에치고유자와",
+          badgeColor: "bg-amber-500",
+          textColor: "text-amber-700",
+          weather: {
+            morning: { temp: "11°C", condition: "구름 많음", icon: "fa-cloud", desc: "사도 출항 시 쌀쌀하므로 겉옷 필수" },
+            afternoon: { temp: "16°C", condition: "흐림 후 갬", icon: "fa-cloud-sun", desc: "우오누마 양조 마을 산책에 상쾌한 기온" },
+            evening: { temp: "10°C", condition: "쌀쌀함", icon: "fa-snowflake", desc: "에치고유자와 온천의 따뜻함이 완벽한 저녁" },
+          },
+          summary: "사도섬에서 니이가타로 귀환 후 신칸센을 타고 우라사역으로 이동. 핫카이산의 마을 우오누마의 사토에서 눈 저장고를 투어하고, 소설 '설국'의 무대 료칸 다카한에 숙박합니다.",
+          spots: [
+            {
+              time: "09:40 - 10:47",
+              name: "사도 료츠항 ➔ 니이가타항 페리 도착",
+              jpName: "両津港 乗船 ➔ 新潟港 下船",
+              type: "transport",
+              icon: "fa-ship",
+              lat: 37.9360,
+              lng: 139.0680,
+              tel: "",
+              transport: "쾌속 제트호일",
+              desc: "사도섬에서의 뜻깊은 일정을 마치고 제트호일을 타고 니이가타 본토로 돌아옵니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=600&q=80",
+              mustDo: "니이가타역으로 이동 준비"
+            },
+            {
+              time: "11:25 - 11:58",
+              name: "니이가타역 ➔ 우라사역 신칸센 토키 탑승",
+              jpName: "新潟駅 新幹線とき ➔ 浦佐駅",
+              type: "transport",
+              icon: "fa-train",
+              lat: 37.1678,
+              lng: 138.9229,
+              tel: "신칸센 토키 (33분 소요)",
+              transport: "상에츠 신칸센",
+              desc: "시속 240km의 쾌적한 상에츠 신칸센 '토키'호를 타고 일본 제일의 쌀 생산지인 우오누마 평야를 가로질러 우라사역으로 향합니다.",
+              foodTip: "신칸센 차내 음료 및 간식",
+              image: "https://images.unsplash.com/photo-1532105956626-9569c03602f6?auto=format&fit=crop&w=600&q=80",
+              mustDo: "차창 밖으로 끝없이 펼쳐지는 황금빛 우오누마 논 풍경 감상"
+            },
+            {
+              time: "12:15",
+              name: "우오누마의 사토 (점심식사 : 사루쿠라야마)",
+              jpName: "魚沼の里 到着 昼食 (八海山村)",
+              type: "restaurant",
+              icon: "fa-bowl-rice",
+              lat: 37.1437,
+              lng: 138.9664,
+              tel: "택시 15분",
+              transport: "택시 이동",
+              desc: "세계적인 사케 '핫카이산(八海山)'의 양조장을 중심으로 조성된 그림 같은 마을. 우오누마산 극상 고시히카리 가마솥 쌀밥과 정갈한 로컬 요리를 맛봅니다.",
+              foodTip: "우오누마 고시히카리 솥밥, 핫카이산 맥주(라이딘 비어), 바움쿠헨",
+              image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+              mustDo: "반짝반짝 윤기가 흐르는 일본 최고의 쌀밥 맛보기"
+            },
+            {
+              time: "13:30",
+              name: "핫카이산 설중저장고(유키무로) 투어",
+              jpName: "雪中貯蔵庫ツアー (八海醸造)",
+              type: "experience",
+              icon: "fa-snowflake",
+              lat: 37.1445,
+              lng: 138.9675,
+              tel: "",
+              transport: "도보 산책",
+              desc: "겨울에 내린 1,000톤의 천연 눈을 보관하여 사계절 내내 영하의 냉기를 유지하는 천연 냉장고 '설중저장고'를 견학합니다. 눈 속에서 숙성된 깊은 맛의 사케를 테이스팅합니다.",
+              foodTip: "설중숙성 핫카이산 3년 숙성 원주",
+              image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=80",
+              mustDo: "서늘한 눈 창고 안에서 눈 속 숙성 사케의 부드러움 체험"
+            },
+            {
+              time: "16:16 - 16:49",
+              name: "우라사역 ➔ 에치고유자와역 (JR 재래선)",
+              jpName: "浦佐駅 JR上越線 ➔ 越後湯沢駅",
+              type: "transport",
+              icon: "fa-train-subway",
+              lat: 36.9360,
+              lng: 138.8094,
+              tel: "16:16발 16:49착 (33분)",
+              transport: "JR 상에츠선",
+              desc: "택시로 우라사역으로 귀환 후, 온천 마을의 중심지 에치고유자와역으로 여유롭게 이동합니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80",
+              mustDo: "철도 차창으로 가와바타 야스나리의 설국 배경 산세 감상"
+            },
+            {
+              time: "17:00",
+              name: "료칸 다카한 (高半) 도착",
+              jpName: "雪国の宿 高半 到着",
+              type: "hotel",
+              icon: "fa-book-open",
+              lat: 36.9442,
+              lng: 138.8005,
+              tel: "025-784-3333 (역 송영)",
+              transport: "료칸 송영버스",
+              desc: "'국경의 긴 터널을 빠져나오자, 눈의 고장이었다.' 노벨문학상 수상작 가와바타 야스나리의 소설 《설국(雪国)》이 집필된 800년 역사의 유서 깊은 온천 료칸입니다.",
+              foodTip: "유자와 산채 및 와규 온천 가이세키 정찬",
+              image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80",
+              mustDo: "작가가 머물렀던 '가스미노마(かすみの間)' 전시실 관람 및 100% 원천수 천연 온천욕"
+            }
+          ]
+        },
+        {
+          id: 4,
+          date: "10/25(일)",
+          title: "에치고유자와 폰슈칸 & 도쿄 경유 귀국",
+          region: "에치고유자와 / 도쿄 / 서울",
+          badgeColor: "bg-purple-600",
+          textColor: "text-purple-700",
+          weather: {
+            morning: { temp: "10°C", condition: "맑음", icon: "fa-sun", desc: "유자와의 상쾌하고 차가운 아침 공기" },
+            afternoon: { temp: "19°C", condition: "쾌청", icon: "fa-sun", desc: "도쿄역 일대 산책하기 따뜻한 가을 날씨" },
+            evening: { temp: "15°C", condition: "선선함", icon: "fa-moon", desc: "하네다 공항 및 김포 도착 시 쾌적" },
+          },
+          summary: "유자와역 구내 명물 폰슈칸에서 사케 자판기와 폭탄 주먹밥을 즐기고 신칸센으로 도쿄역에 도착, 자유 쇼핑 후 점보택시로 하네다공항으로 이동하여 귀국합니다.",
+          spots: [
+            {
+              time: "10:00",
+              name: "에치고유자와역 폰슈칸 (ぽんしゅ館)",
+              jpName: "越後湯沢駅 ぽんしゅ館",
+              type: "experience",
+              icon: "fa-wine-bottle",
+              lat: 36.9360,
+              lng: 138.8094,
+              tel: "역사 내 쇼핑몰",
+              transport: "도보 이동",
+              desc: "니이가타현 내 90여 개 양조장의 사케를 100여 대의 자동판매기에서 500엔(코인 5개)으로 골라 마시는 사케 테마파크! 고시히카리 밥 1홉이 들어가는 거대한 '바쿠단 오니기리(폭탄 주먹밥)'도 필수 코스입니다.",
+              foodTip: "바쿠단 오니기리(명란, 연어 등), 폰슈칸 사케 시음, 사케 소프트아이스크림",
+              image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80",
+              mustDo: "코인 자판기에서 마음에 드는 사케 5종 비교 시음 & 대왕 주먹밥 맛보기"
+            },
+            {
+              time: "11:13 - 12:28",
+              name: "에치고유자와역 ➔ 도쿄역 (신칸센 토키 316호)",
+              jpName: "越後湯沢発 新幹線とき316号 ➔ 東京駅",
+              type: "transport",
+              icon: "fa-train-tram",
+              lat: 35.6812,
+              lng: 139.7671,
+              tel: "11:13발 12:28착 (75분)",
+              transport: "신칸센 고속열차",
+              desc: "신칸센 토키 316호를 타고 쾌속으로 질주하여 일본의 심장부 도쿄역에 정시 도착합니다.",
+              foodTip: "에키벤(기차 도시락)과 캔 녹차",
+              image: "https://images.unsplash.com/photo-1532105956626-9569c03602f6?auto=format&fit=crop&w=600&q=80",
+              mustDo: "도쿄로 진입하는 메가폴리스 빌딩 숲 전경 관람"
+            },
+            {
+              time: "12:30 - 16:30",
+              name: "도쿄역 도착 & 각자 점심 및 자유 시간",
+              jpName: "東京駅到着 昼食・フリータイム",
+              type: "shopping",
+              icon: "fa-bag-shopping",
+              lat: 35.6812,
+              lng: 139.7671,
+              tel: "다이마루 백화점 등",
+              transport: "도보 / 자유",
+              desc: "역사 깊은 도쿄역 붉은 벽돌 청사와 도쿄역 1번가, 다이마루 백화점, 긴자 일대를 둘러보며 자유롭게 점심을 먹고 귀국 기념품을 쇼핑합니다.",
+              foodTip: "도쿄 라멘 스트리트, 스시, 도쿄 바나나, 프레스 버터 샌드",
+              image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80",
+              mustDo: "도쿄역 마루노우치 광장에서 기념사진 찍고 쇼핑 즐기기"
+            },
+            {
+              time: "16:50",
+              name: "하네다 공항 이동 (점보택시 탑승)",
+              jpName: "羽田空港移動 (ジャンボタクシー)",
+              type: "transport",
+              icon: "fa-van-shuttle",
+              lat: 35.5494,
+              lng: 139.7798,
+              tel: "점보택시 이동",
+              transport: "전용 점보택시",
+              desc: "약속 장소에 모여 점보택시를 타고 도쿄 도시고속도로를 달려 하네다 국제공항 제3터미널로 편안하게 이동합니다.",
+              foodTip: "",
+              image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=600&q=80",
+              mustDo: "9인 짐 체크 및 공항 이동"
+            },
+            {
+              time: "19:50 - 22:25",
+              name: "하네다 공항 T3 ➔ 김포공항 도착",
+              jpName: "羽田空港T3出発 ➔ 金浦空港到着",
+              type: "flight",
+              icon: "fa-plane-arrival",
+              lat: 37.5583,
+              lng: 126.7906,
+              tel: "하네다 T3 출발",
+              transport: "항공편 (대한항공/아시아나 등)",
+              desc: "하네다 공항 면세점 쇼핑 후 비행기에 탑승하여 서울 김포공항에 도착하며 3박 4일간의 아름다운 여정을 마무리합니다.",
+              foodTip: "공항 면세점 도쿄 쇼핑 간식",
+              image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80",
+              mustDo: "김포공항 수속 및 따뜻한 여행 마무리 인사"
+            }
+          ]
+        }
+      ],
+      specialties: [
+        {
+          id: "hegi",
+          name: "헤기소바 (へぎそば)",
+          region: "니이가타 시내 / 우오누마",
+          category: "식사",
+          tag: "필수 먹거리",
+          icon: "fa-bowl-food",
+          color: "text-emerald-700 bg-emerald-50 border-emerald-200",
+          desc: "해초인 '후노리(청각채)'를 메밀 반죽에 넣어 '헤기'라는 사각 삼나무 판에 한입 크기로 담아내는 소바. 일반 소바보다 훨씬 매끄럽고 쫄깃한 탄력이 특징입니다.",
+          where: "코지마야 총본점 (1일차 점심)",
+          tip: "와사비 대신 겨자를 쯔유에 풀어먹는 것이 전통적인 현지 방식!"
+        },
+        {
+          id: "sasadango",
+          name: "사사당고 & 사사모찌 (笹団子)",
+          region: "니이가타 시내",
+          category: "디저트",
+          tag: "추천 선물",
+          icon: "fa-leaf",
+          color: "text-green-700 bg-green-50 border-green-200",
+          desc: "향긋한 조릿대(사사) 잎에 쑥떡을 싸서 찐 니이가타의 전통 떡. 살균 효과가 있어 옛날 무사들의 비상식량이었으며, 팥앙금의 은은한 단맛과 쑥 향이 환상적입니다.",
+          where: "다나카야 본점 미나토 공방 (1일차 디저트)",
+          tip: "갓 쪄서 따끈따끈할 때 먹는 것이 가장 부드럽고 맛있습니다."
+        },
+        {
+          id: "koshihikari",
+          name: "우오누마산 고시히카리 (魚沼産コシヒカリ)",
+          region: "우오누마 / 유자와",
+          category: "쌀 / 식사",
+          tag: "일본 1위 쌀",
+          icon: "fa-seedling",
+          color: "text-amber-700 bg-amber-50 border-amber-200",
+          desc: "눈 녹은 차가운 미네랄 수와 큰 일교차 덕분에 단맛, 찰기, 윤기가 일본 최고로 평가받는 최고급 쌀입니다. 밥만 먹어도 달콤한 감칠맛이 납니다.",
+          where: "우오누마의 사토 (3일차 점심), 폰슈칸 바쿠단 오니기리 (4일차)",
+          tip: "폰슈칸에서 우오누마 쌀로 갓 지은 대왕 오니기리(폭탄 주먹밥)는 필수!"
+        },
+        {
+          id: "hakkaisan",
+          name: "핫카이산 & 설중숙성 사케 (八海山)",
+          region: "우오누마",
+          category: "주류 / 특산품",
+          tag: "프리미엄 사케",
+          icon: "fa-wine-bottle",
+          color: "text-blue-700 bg-blue-50 border-blue-200",
+          desc: "눈 1,000톤으로 유지되는 천연 눈 창고(유키무로)에서 3년간 영하의 온도로 숙성시킨 부드럽고 우아한 명주. 목 넘김이 놀라울 정도로 깔끔합니다.",
+          where: "우오누마의 사토 설중저장고 (3일차)",
+          tip: "설중저장고 한정판 사케는 시중에서 구하기 힘든 특별한 선물입니다."
+        },
+        {
+          id: "sado_seafood",
+          name: "사도섬 신선 해산물 & 방어 (佐渡の海産物)",
+          region: "사도섬",
+          category: "해산물",
+          tag: "산지 직송",
+          icon: "fa-fish",
+          color: "text-cyan-700 bg-cyan-50 border-cyan-200",
+          desc: "동해의 한류와 난류가 만나는 사도섬 바다는 겨울철 기름진 방어, 달콤한 남만새우(단새우), 붉은 대게, 소라가 풍부합니다.",
+          where: "오료리 아나구치(2일차 점심) & 사도 료칸 가이세키",
+          tip: "사도 앞바다의 싱싱한 해산물과 사도규 스테이크의 조화를 꼭 경험해 보세요."
+        },
+        {
+          id: "ponshukan",
+          name: "폰슈칸 사케 자판기 체험 (ぽんしゅ館)",
+          region: "니이가타역 / 에치고유자와역",
+          category: "체험 / 주류",
+          tag: "사케 테마파크",
+          icon: "fa-coins",
+          color: "text-purple-700 bg-purple-50 border-purple-200",
+          desc: "500엔으로 코인 5개와 전용 잔을 받아, 100여 개가 넘는 사케 자판기에서 원하는 술을 마음껏 뽑아 마실 수 있는 사케 애주가들의 천국입니다.",
+          where: "1일차 호텔 근처 또는 4일차 에치고유자와역",
+          tip: "자판기 옆에 마련된 전국 각지의 무료 천일염(소금)을 안주 삼아 시음해보세요."
+        },
+        {
+          id: "tarekatsu",
+          name: "니이가타 타레카츠동 (タレカツ丼)",
+          region: "니이가타 시내",
+          category: "로컬 소울푸드",
+          tag: "현지 별미",
+          icon: "fa-drumstick-bite",
+          color: "text-red-700 bg-red-50 border-red-200",
+          desc: "달걀을 풀지 않고, 얇게 튀긴 바삭한 돈까스를 짭조름하고 달콤한 특제 간장 양념(타레)에 푹 담가 갓 지은 쌀밥 위에 얹어 먹는 니이가타식 돈까스덮밥입니다.",
+          where: "니이가타 시내 저녁 식당",
+          tip: "겉은 바삭하면서도 달콤 짭짤한 간장 풍미가 밥도둑입니다."
+        },
+        {
+          id: "sado_persimmon",
+          name: "오케사 감 & 곶감 (おけさ柿)",
+          region: "사도섬",
+          category: "과일 / 디저트",
+          tag: "가을 한정",
+          icon: "fa-apple-whole",
+          color: "text-orange-700 bg-orange-50 border-orange-200",
+          desc: "씨가 없고 과즙이 풍부하며 당도가 높은 사도섬의 명품 감. 10월 말 수확기를 맞아 가장 달고 싱싱한 상태로 즐기실 수 있습니다.",
+          where: "사도섬 기념품점 및 토키노모리 공원",
+          tip: "말린 곶감(안포가키)이나 감 샤베트는 디저트로 최고입니다."
+        }
+      ]
+    };
+
+    // State management
+    let currentDayIndex = 0; // 0 = Day 1, 1 = Day 2, 2 = Day 3, 3 = Day 4, -1 = All Days
+    let map = null;
+    let markersLayer = null;
+    let polylinesLayer = null;
+    let userMarker = null;
+    let checkedItems = JSON.parse(localStorage.getItem('niigata_checked_items') || '{}');
+  </script>
+
+
+  <script>
+    function initMap() {
+      // Centered generally on Niigata & Sado island region
+      map = L.map('map', {
+        zoomControl: true,
+        scrollWheelZoom: true
+      }).setView([37.6, 138.8], 8);
+
+      // OpenStreetMap Tile Layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      markersLayer = L.layerGroup().addTo(map);
+      polylinesLayer = L.layerGroup().addTo(map);
+
+      renderDayRouteOnMap(0);
+    }
+
+    // Color definitions for map polylines & markers
+    const DAY_COLORS = {
+      1: '#0284c7', // Sky blue
+      2: '#059669', // Emerald
+      3: '#d97706', // Amber
+      4: '#7c3aed'  // Violet
+    };
+
+    function renderDayRouteOnMap(dayIdx) {
+      markersLayer.clearLayers();
+      polylinesLayer.clearLayers();
+
+      const daysToRender = dayIdx = -1 ? TRIP_DATA.days : [TRIP_DATA.days[dayIdx]];
+      let allLatLngs = [];
+
+      daysToRender.forEach(day => {
+        const color = DAY_COLORS[day.id];
+        const routePoints = [];
+
+        day.spots.forEach((spot, idx) => {
+          // If spot is in Korea (e.g. Incheon / Gimpo), we show it only in All view or when relevant
+          if (spot.lat && spot.lng) {
+            const latlng = [spot.lat, spot.lng];
+            allLatLngs.push(latlng);
+            routePoints.push(latlng);
+
+            // Create custom HTML circle marker
+            const markerHtml = `
+              <div style="background-color:${color}; width:28px; height:28px; border-radius:50%; border:2.5px solid white; box-shadow:0 3px 8px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:bold;">
+                ${idx + 1}
+              </div>
+            `;
+
+            const customIcon = L.divIcon({
+              className: 'custom-map-pin',
+              html: markerHtml,
+              iconSize: [28, 28],
+              iconAnchor: [14, 14],
+              popupAnchor: [0, -14]
+            });
+
+            const marker = L.marker(latlng, { icon: customIcon });
+
+            // Popup content with direct Google Maps navigation button
+            const googleNavUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.jpName || spot.name)}`;
+            const popupContent = `
+              <div style="width:230px;" class="p-3">
+                <div class="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase">
+                  <span>${day.date}</span> • <span>${spot.time}</span>
+                </div>
+                <div class="font-bold text-slate-900 text-sm mt-0.5">${spot.name}</div>
+                <div class="text-[11px] text-slate-500">${spot.jpName}</div>
+                ${spot.tel ? `<div class="text-[11px] text-blue-600 mt-1"><i class="fa-solid fa-phone mr-1"></i>${spot.tel}</div>` : ''}
+                <p class="text-[12px] text-slate-600 mt-2 line-clamp-2">${spot.desc}</p>
+                <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <span class="text-[11px] font-medium text-slate-500">${spot.transport}</span>
+                  <a href="${googleNavUrl}" target="_blank" rel="noopener noreferrer" 
+                     class="text-[11px] bg-sky-600 hover:bg-sky-700 text-white px-2 py-1 rounded font-medium flex items-center gap-1 transition">
+                    <i class="fa-brands fa-google"></i> 길찾기
+                  </a>
+                </div>
+              </div>
+            `;
+
+            marker.bindPopup(popupContent);
+            markersLayer.addLayer(marker);
+          }
+        });
+
+        // Add connecting polyline for route
+        if (routePoints.length > 1) {
+          const polyline = L.polyline(routePoints, {
+            color: color,
+            weight: 3.5,
+            opacity: 0.8,
+            dashArray: day.id = 2 ? '6, 6' : null // Dashed for ferry/island
+          });
+          polylinesLayer.addLayer(polyline);
+        }
+      });
+
+      if (allLatLngs.length > 0) {
+        map.fitBounds(allLatLngs, { padding: [40, 40], maxZoom: 14 });
+      }
+    }
+
+    function fitCurrentDayRoute() {
+      renderDayRouteOnMap(currentDayIndex);
+    }
+
+    function locateUser() {
+      if (!navigator.geolocation) {
+        showToast("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+        return;
+      }
+
+      showToast("현재 내 위치를 조회하는 중입니다...");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          
+          if (userMarker) {
+            userMarker.setLatLng([lat, lng]);
+          } else {
+            const userIcon = L.divIcon({
+              className: 'user-loc-icon',
+              html: '<div class="user-pulse-marker"></div>',
+              iconSize: [16, 16],
+              iconAnchor: [8, 8]
+            });
+            userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+          }
+          userMarker.bindPopup("<b>내 현재 위치</b>").openPopup();
+          map.setView([lat, lng], 13);
+          showToast("현재 위치를 지도에 표시했습니다!");
+        },
+        (err) => {
+          console.warn(err);
+          showToast("위치 정보를 가져올 수 없습니다. GPS 권한을 확인해주세요.");
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  </script>
+
+
+  <script>
+    function renderDayTabs() {
+      const container = document.getElementById('dayTabsContainer');
+      let html = '';
+
+      TRIP_DATA.days.forEach((day, index) => {
+        const activeClass = index = currentDayIndex 
+          ? 'bg-sky-500 text-white font-bold shadow-md shadow-sky-500/30' 
+          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white';
+
+        html += `
+          <button onclick="selectDay(${index})" class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${activeClass}">
+            <span class="w-2 h-2 rounded-full ${index = 0 ? 'bg-sky-400' : index = 1 ? 'bg-emerald-400' : index = 2 ? 'bg-amber-400' : 'bg-purple-400'}"></span>
+            <span>${day.id}일차 (${day.date.split('(')[0]})</span>
+          </button>
+        `;
+      });
+
+      // All Days option
+      const allActive = currentDayIndex = -1 ? 'bg-sky-500 text-white font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700';
+      html += `
+        <button onclick="selectDay(-1)" class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${allActive}">
+          <i class="fa-solid fa-layer-group text-xs"></i>
+          <span>전체 여정</span>
+        </button>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function selectDay(index) {
+      currentDayIndex = index;
+      renderDayTabs();
+      renderDaySummary();
+      renderSpots();
+      renderDayRouteOnMap(index);
+
+      // Update Map Header Badge
+      const mapBadge = document.getElementById('mapDayBadge');
+      if (index = -1) {
+        mapBadge.innerText = '전체 일정';
+        mapBadge.className = 'text-[11px] px-2 py-0.5 rounded-md font-medium bg-slate-100 text-slate-700';
+      } else {
+        const d = TRIP_DATA.days[index];
+        mapBadge.innerText = `${d.id}일차 - ${d.region}`;
+        mapBadge.className = `text-[11px] px-2 py-0.5 rounded-md font-medium bg-sky-100 text-sky-700`;
+      }
+    }
+
+    function renderDaySummary() {
+      const container = document.getElementById('daySummaryCard');
+      if (currentDayIndex = -1) {
+        container.innerHTML = `
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold px-2 py-0.5 bg-slate-800 text-white rounded">총 3박 4일</span>
+              <h3 class="font-bold text-slate-900 text-base">니이가타현 • 사도섬 • 우오누마 • 에치고유자와 대장정</h3>
+            </div>
+            <p class="text-xs text-slate-600">바다와 설국, 사케와 극상의 쌀밥을 만끽하는 최적의 일정입니다. 상단 탭에서 일차를 선택하면 상세 코스와 날씨를 보실 수 있습니다.</p>
+          </div>
+          <div class="flex gap-2 text-xs font-semibold">
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+              <span class="text-slate-400 block text-[10px]">전체 이동</span>
+              <span class="text-sky-700 font-bold">25개 명소</span>
+            </div>
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200 text-center shadow-xs">
+              <span class="text-slate-400 block text-[10px]">교통편</span>
+              <span class="text-emerald-700 font-bold">하이에이스/신칸센</span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const d = TRIP_DATA.days[currentDayIndex];
+      container.innerHTML = `
+        <div class="space-y-1.5 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-md text-white ${d.badgeColor}">${d.id}일차</span>
+            <span class="text-xs font-semibold text-slate-500">${d.date} (${d.region})</span>
+            <span class="text-sm font-bold text-slate-900">${d.title}</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">${d.summary}</p>
+        </div>
+
+        <!-- Weather Mini Preview Widget -->
+        <div class="bg-white/90 backdrop-blur p-2.5 rounded-xl border border-sky-100 shadow-xs flex items-center space-x-3 w-full sm:w-auto justify-around">
+          <div class="text-center px-1">
+            <span class="text-[10px] text-slate-400 block">오전</span>
+            <i class="fa-solid ${d.weather.morning.icon} text-sky-500 text-sm my-0.5"></i>
+            <span class="text-xs font-bold text-slate-700 block">${d.weather.morning.temp}</span>
+          </div>
+          <div class="h-6 w-px bg-slate-200"></div>
+          <div class="text-center px-1">
+            <span class="text-[10px] text-slate-400 block">오후</span>
+            <i class="fa-solid ${d.weather.afternoon.icon} text-amber-500 text-sm my-0.5"></i>
+            <span class="text-xs font-bold text-slate-700 block">${d.weather.afternoon.temp}</span>
+          </div>
+          <div class="h-6 w-px bg-slate-200"></div>
+          <div class="text-center px-1">
+            <span class="text-[10px] text-slate-400 block">저녁</span>
+            <i class="fa-solid ${d.weather.evening.icon} text-indigo-500 text-sm my-0.5"></i>
+            <span class="text-xs font-bold text-slate-700 block">${d.weather.evening.temp}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSpots() {
+      const container = document.getElementById('spotsContainer');
+      const titleEl = document.getElementById('timelineTitle');
+      const countEl = document.getElementById('spotCountText');
+
+      let spotsList = [];
+      if (currentDayIndex = -1) {
+        titleEl.innerText = '전체 3박 4일 일정 타임라인';
+        TRIP_DATA.days.forEach(d => {
+          d.spots.forEach(s => spotsList.push({ ...s, dayId: d.id, dayDate: d.date }));
+        });
+      } else {
+        const d = TRIP_DATA.days[currentDayIndex];
+        titleEl.innerText = `${d.id}일차 일정 (${d.date}) - ${d.region}`;
+        spotsList = d.spots.map(s => ({ ...s, dayId: d.id, dayDate: d.date }));
+      }
+
+      countEl.innerText = `${spotsList.length}개 스팟`;
+
+      let html = '';
+      spotsList.forEach((spot, idx) => {
+        const isChecked = checkedItems[spot.name] ? true : false;
+        const googleUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.jpName || spot.name)}`;
+
+        html += `
+          <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all overflow-hidden ${isChecked ? 'opacity-70 bg-slate-50/60' : ''}">
+            <div class="p-4 sm:p-5 flex flex-col md:flex-row gap-4">
+              
+              <!-- Left Thumbnail & Transport info -->
+              <div class="md:w-44 flex-shrink-0 flex flex-col justify-between">
+                <div class="relative w-full h-32 md:h-28 rounded-xl overflow-hidden bg-slate-100 shadow-inner">
+                  <img src="${spot.image}" alt="${spot.name}" class="w-full h-full object-cover" 
+                       onerror="this.onerror=null; this.src='https://placehold.co/400x300/0284c7/ffffff?text=${encodeURIComponent(spot.name.slice(0, 10))}';" />
+                  <span class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                    <i class="fa-regular fa-clock"></i> ${spot.time}
+                  </span>
+                </div>
+                <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+                  <span class="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded text-[11px] font-medium">
+                    <i class="fa-solid fa-route text-slate-400"></i> ${spot.transport}
+                  </span>
+                  ${spot.tel ? `<a href="tel:${spot.tel}" class="text-sky-600 font-bold hover:underline"><i class="fa-solid fa-phone"></i> 전화</a>` : ''}
+                </div>
+              </div>
+
+              <!-- Main Content Info -->
+              <div class="flex-1 flex flex-col justify-between space-y-2">
+                <div>
+                  <div class="flex items-start justify-between gap-2">
+                    <div>
+                      <div class="text-[11px] font-semibold text-sky-600 flex items-center gap-1.5">
+                        <span class="w-5 h-5 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-[10px]">${idx + 1}</span>
+                        <span>${spot.jpName || ''}</span>
+                      </div>
+                      <h4 class="text-base font-bold text-slate-900 mt-0.5 flex items-center gap-2">
+                        ${spot.name}
+                        ${spot.foodTip ? `<span class="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-semibold">추천 미식</span>` : ''}
+                      </h4>
+                    </div>
+
+                    <!-- Visit check button -->
+                    <button onclick="toggleCheckSpot('${spot.name}')" class="text-xs p-1.5 rounded-lg border transition ${isChecked ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-slate-100 text-slate-400 hover:text-slate-600 border-slate-200'}">
+                      <i class="fa-solid ${isChecked ? 'fa-check' : 'fa-check'} text-xs"></i>
+                      <span class="hidden sm:inline ml-1">${isChecked ? '방문 완료' : '방문 체크'}</span>
+                    </button>
+                  </div>
+
+                  <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${spot.desc}</p>
+
+                  <!-- Food Tip / Must-do highlights -->
+                  ${spot.foodTip ? `
+                    <div class="mt-2 p-2 bg-amber-50/70 rounded-xl border border-amber-200/60 text-xs text-amber-900 flex items-start gap-1.5">
+                      <i class="fa-solid fa-utensils text-amber-600 mt-0.5 flex-shrink-0"></i>
+                      <div><strong class="font-semibold">추천 먹거리:</strong> ${spot.foodTip}</div>
+                    </div>
+                  ` : ''}
+
+                  ${spot.mustDo ? `
+                    <div class="mt-1.5 p-2 bg-sky-50/70 rounded-xl border border-sky-100 text-xs text-sky-950 flex items-start gap-1.5">
+                      <i class="fa-solid fa-circle-check text-sky-600 mt-0.5 flex-shrink-0"></i>
+                      <div><strong class="font-semibold">포인트 & 팁:</strong> ${spot.mustDo}</div>
+                    </div>
+                  ` : ''}
+                </div>
+
+                <!-- Bottom Action Buttons -->
+                <div class="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 text-xs">
+                  <div class="text-slate-400 text-[11px]">
+                    ${spot.dayDate ? `${spot.dayDate} 일정` : ''}
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <button onclick="focusOnMap(${spot.lat}, ${spot.lng}, '${spot.name.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition flex items-center gap-1">
+                      <i class="fa-solid fa-location-dot text-red-500"></i> 지도에서 위치 보기
+                    </button>
+                    <a href="${googleUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg font-medium transition flex items-center gap-1 shadow-xs">
+                      <i class="fa-brands fa-google"></i> 구글 지도 열기
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function toggleCheckSpot(name) {
+      checkedItems[name] = !checkedItems[name];
+      localStorage.setItem('niigata_checked_items', JSON.stringify(checkedItems));
+      renderSpots();
+      showToast(checkedItems[name] ? `"${name}" 방문 체크 완료!` : `"${name}" 체크를 해제했습니다.`);
+    }
+
+    function focusOnMap(lat, lng, name) {
+      if (!map) return;
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+      map.setView([lat, lng], 15);
+      showToast(`${name} 위치로 지도를 이동했습니다.`);
+    }
+  </script>
+
+
+  <script>
+    function renderSpecialties() {
+      const grid = document.getElementById('specialtiesGrid');
+      let html = '';
+
+      TRIP_DATA.specialties.forEach(item => {
+        const isBought = checkedItems['spec_' + item.id] ? true : false;
+        html += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between ${isBought ? 'bg-amber-50/40 border-amber-300' : ''}">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${item.color} border">
+                  ${item.tag}
+                </span>
+                <span class="text-xs text-slate-400 font-medium">${item.region}</span>
+              </div>
+
+              <div class="flex items-center space-x-2 pt-1">
+                <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-sm shadow-xs">
+                  <i class="fa-solid ${item.icon}"></i>
+                </div>
+                <h4 class="font-bold text-slate-900 text-base">${item.name}</h4>
+              </div>
+
+              <p class="text-xs text-slate-600 leading-relaxed">${item.desc}</p>
+              
+              <div class="bg-slate-50 p-2 rounded-xl text-xs space-y-1">
+                <div class="text-slate-700"><strong>📍 맛볼 수 있는 곳:</strong> ${item.where}</div>
+                <div class="text-amber-800"><strong>💡 꿀팁:</strong> ${item.tip}</div>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+              <button onclick="toggleSpecialtyCheck('${item.id}', '${item.name}')" class="w-full py-1.5 text-xs font-semibold rounded-lg border transition flex items-center justify-center gap-1.5 ${isBought ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200'}">
+                <i class="fa-solid ${isBought ? 'fa-circle-check' : 'fa-check'}"></i>
+                <span>${isBought ? '맛보기 / 구매 완료!' : '먹킷리스트 완료 체크'}</span>
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function toggleSpecialtyCheck(id, name) {
+      const key = 'spec_' + id;
+      checkedItems[key] = !checkedItems[key];
+      localStorage.setItem('niigata_checked_items', JSON.stringify(checkedItems));
+      renderSpecialties();
+      showToast(checkedItems[key] ? `"${name}" 먹킷리스트 완료 달성! 👏` : `"${name}" 완료를 취소했습니다.`);
+    }
+
+    function renderWeatherDetailed() {
+      const container = document.getElementById('weatherDetailedCards');
+      let html = '';
+
+      TRIP_DATA.days.forEach(day => {
+        html += `
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+            <div class="flex items-center justify-between border-b pb-2">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold px-2 py-0.5 rounded text-white ${day.badgeColor}">${day.id}일차</span>
+                <span class="font-bold text-slate-800 text-sm">${day.date} - ${day.region}</span>
+              </div>
+              <span class="text-xs text-slate-500">예상 날씨</span>
+            </div>
+
+            <!-- 3 Timeslots Grid -->
+            <div class="grid grid-cols-3 gap-2 text-center">
+              
+              <!-- Morning -->
+              <div class="bg-sky-50/60 p-2.5 rounded-xl border border-sky-100">
+                <span class="text-[11px] font-semibold text-sky-800 block">오전 (09:00~)</span>
+                <i class="fa-solid ${day.weather.morning.icon} text-sky-500 text-xl my-1.5"></i>
+                <div class="font-bold text-slate-800 text-sm">${day.weather.morning.temp}</div>
+                <div class="text-[10px] text-slate-500">${day.weather.morning.condition}</div>
+                <p class="text-[10px] text-sky-900 mt-1 line-clamp-2">${day.weather.morning.desc}</p>
+              </div>
+
+              <!-- Afternoon -->
+              <div class="bg-amber-50/60 p-2.5 rounded-xl border border-amber-100">
+                <span class="text-[11px] font-semibold text-amber-800 block">오후 (13:00~)</span>
+                <i class="fa-solid ${day.weather.afternoon.icon} text-amber-500 text-xl my-1.5"></i>
+                <div class="font-bold text-slate-800 text-sm">${day.weather.afternoon.temp}</div>
+                <div class="text-[10px] text-slate-500">${day.weather.afternoon.condition}</div>
+                <p class="text-[10px] text-amber-900 mt-1 line-clamp-2">${day.weather.afternoon.desc}</p>
+              </div>
+
+              <!-- Evening -->
+              <div class="bg-indigo-50/60 p-2.5 rounded-xl border border-indigo-100">
+                <span class="text-[11px] font-semibold text-indigo-800 block">저녁 (18:00~)</span>
+                <i class="fa-solid ${day.weather.evening.icon} text-indigo-500 text-xl my-1.5"></i>
+                <div class="font-bold text-slate-800 text-sm">${day.weather.evening.temp}</div>
+                <div class="text-[10px] text-slate-500">${day.weather.evening.condition}</div>
+                <p class="text-[10px] text-indigo-900 mt-1 line-clamp-2">${day.weather.evening.desc}</p>
+              </div>
+
+            </div>
+
+            <!-- Clothes Advice -->
+            <div class="bg-slate-50 p-2.5 rounded-xl text-xs text-slate-600 flex items-start gap-2">
+              <i class="fa-solid fa-shirt text-slate-400 mt-0.5"></i>
+              <div>
+                <strong>추천 복장:</strong> 낮에는 긴팔 셔츠나 얇은 니트가 적당하지만, 바닷바람(사도섬)과 저녁 산간 지역(유자와)은 10~13도로 쌀쌀하므로 가디건이나 경량 패딩을 반드시 준비하세요.
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+  </script>
+
+
+  <script>
+    async function sendAiMessage() {
+      const input = document.getElementById('aiInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const history = document.getElementById('aiChatHistory');
+      
+      // User message bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = 'bg-purple-600 text-white p-3 rounded-xl rounded-tr-none ml-auto w-fit max-w-[85%] text-xs sm:text-sm shadow-xs';
+      userBubble.innerText = text;
+      history.appendChild(userBubble);
+      input.value = '';
+      history.scrollTop = history.scrollHeight;
+
+      // Loading indicator bubble
+      const loadingBubble = document.createElement('div');
+      loadingBubble.className = 'bg-slate-100 text-slate-600 p-3 rounded-xl rounded-tl-none w-fit text-xs flex items-center gap-2';
+      loadingBubble.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-purple-600"></i> 니이가타 현지 정보를 검색하고 분석 중입니다...';
+      history.appendChild(loadingBubble);
+      history.scrollTop = history.scrollHeight;
+
+      const apiKey = ""; // Canvas runtime injection
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+      const systemPrompt = `
+        너는 일본 니이가타현, 사도섬, 우오누마, 에치고유자와 3박 4일 여행 전문 VIP 가이드 AI입니다.
+        이번 투어의 인원은 9명이며, 1~2일차는 전용 점보택시(하이에이스)를 탑승합니다.
+        
+        확정된 여행 일정:
+        - 1일차: 인천공항 -> 니이가타 공항 -> 코지마야 총본점(헤기소바) -> 다나카야 본점 미나토공방(사사모찌) -> 하쿠산 신사 -> 후루사토무라 바자르관 -> 호텔 글로벌 뷰 니이가타(Hotel Global View Niigata, 니이가타역 앞 체크인 & 대욕장) -> 저녁식사 니이가타 후루마치 지콘(新潟古町 而今, 노도구로 및 프리미엄 향토요리)
+        - 2일차: 니이가타항 -> 사도섬 료츠항(제트호일) -> 오기민속박물관 -> 다라이분(대야배 체험) -> 점심식사 오료리 아나구치(お料理 あなぐち, 슈쿠네기 선주 고택의 사도규 & 로컬 프렌치 코스) -> 토키노모리 따오기공원 -> 텐료하이 양조장 견학(마야 사케 시음) -> 사도 료칸(온천 및 가이세키)
+        - 3일차: 사도 료츠항 -> 니이가타항 -> 상에츠 신칸센 토키(우라사역) -> 우오누마의 사토(핫카이산 마을 솥밥 점심 & 설중저장고 유키무로 투어) -> JR상에츠선 -> 에치고유자와역 -> 소설 '설국'의 무대 료칸 다카한(원천 온천욕)
+        - 4일차: 에치고유자와역 폰슈칸(100여종 사케자판기 & 폭탄 주먹밥) -> 신칸센 토키(도쿄역 이동) -> 도쿄역 자유시간 & 각자 점심 -> 점보택시 탑승 -> 하네다공항 T3 -> 김포공항 귀국
+
+        사용자의 질문에 맞춰 친절하고 유용한 실전 팁(식사 주문 요령, 지콘과 아나구치의 추천 메뉴 및 매력, 사케 선택 기준, 문화 상식, 유용한 일본어 단어 등)을 3~4문장 내외로 명확하고 알기 쉽게 한국어로 답변하세요.
+      `;
+
+      const payload = {
+        contents: [{ parts: [{ text: text }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] }
+      };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "죄송합니다. 일시적인 오류로 답변을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.";
+        
+        history.removeChild(loadingBubble);
+
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'bg-slate-100 text-slate-800 p-3.5 rounded-xl rounded-tl-none w-fit max-w-[88%] text-xs sm:text-sm leading-relaxed border border-slate-200/60 shadow-xs';
+        // Simple markdown newline formatting
+        aiBubble.innerHTML = reply.replace(/\n/g, '<br/>');
+        history.appendChild(aiBubble);
+        history.scrollTop = history.scrollHeight;
+
+      } catch (err) {
+        console.error(err);
+        history.removeChild(loadingBubble);
+        const errBubble = document.createElement('div');
+        errBubble.className = 'bg-red-50 text-red-600 p-2.5 rounded-xl text-xs';
+        errBubble.innerText = '네트워크 연결 또는 API 요청 중 문제가 발생했습니다.';
+        history.appendChild(errBubble);
+      }
+    }
+
+    function setAiPrompt(promptText) {
+      switchView('ai');
+      const input = document.getElementById('aiInput');
+      input.value = promptText;
+      sendAiMessage();
+    }
+  </script>
+
+
+  <script>
+    function switchView(viewName) {
+      // Buttons styling reset
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.remove('bg-sky-600', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-600');
+      });
+      const activeBtn = document.getElementById('viewBtn-' + viewName);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-sky-600', 'text-white');
+        activeBtn.classList.remove('bg-white', 'text-slate-600');
+      }
+
+      // Hide all views
+      ['timeline', 'specialties', 'weather', 'ai'].forEach(v => {
+        const el = document.getElementById(v + 'View');
+        if (el) el.classList.add('hidden');
+      });
+
+      // Show selected
+      const target = document.getElementById(viewName + 'View');
+      if (target) target.classList.remove('hidden');
+
+      if (viewName = 'specialties') renderSpecialties();
+      if (viewName = 'weather') renderWeatherDetailed();
+    }
+
+    function openInfoModal() {
+      document.getElementById('infoModal').classList.remove('hidden');
+    }
+
+    function closeInfoModal() {
+      document.getElementById('infoModal').classList.add('hidden');
+    }
+
+    function openDeployModal() {
+      document.getElementById('deployModal').classList.remove('hidden');
+    }
+
+    function closeDeployModal() {
+      document.getElementById('deployModal').classList.add('hidden');
+    }
+
+    function copyCurrentWebUrl() {
+      const dummyInput = document.createElement('input');
+      dummyInput.value = window.location.href;
+      document.body.appendChild(dummyInput);
+      dummyInput.select();
+      try {
+        document.execCommand('copy');
+        showToast("현재 웹 주소가 클립보드에 복사되었습니다! 카톡에 공유하세요.");
+      } catch (err) {
+        showToast("주소 복사에 실패했습니다. 브라우저 주소창을 직접 복사해주세요.");
+      }
+      document.body.removeChild(dummyInput);
+    }
+
+    function showToast(msg) {
+      let toast = document.getElementById('appToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'appToast';
+        toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-[1000] bg-slate-900/95 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-2xl transition-all duration-300 opacity-0 pointer-events-none border border-slate-700/80';
+        document.body.appendChild(toast);
+      }
+      toast.innerText = msg;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translate(-50%, -8px)';
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, 0)';
+      }, 2600);
+    }
+
+    // Window load bootstrap
+    window.onload = function () {
+      renderDayTabs();
+      renderDaySummary();
+      renderSpots();
+      initMap();
+    };
+  </script>
+
+
+</body>
+</html>
+
